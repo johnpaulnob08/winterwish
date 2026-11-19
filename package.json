@@ -11,7 +11,7 @@
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "firebase": "^10.14.1",
-    "firebase-admin": "^14.5.1",
+    "firebase-admin": "^13.10.0",
     "framer-motion": "^11.11.17",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.460.0",
