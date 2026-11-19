@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body {
+    @apply font-sans text-frost antialiased;
+    background: radial-gradient(1200px 700px at 50% -10%, #1d4f91 0%, transparent 60%),
+      linear-gradient(180deg, #102A56 0%, #173B70 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  h1, h2, h3 { @apply font-display; }
+  :focus-visible { @apply outline-none ring-2 ring-gold ring-offset-2 ring-offset-midnight; }
+}
+
+@layer components {
+  .glass { @apply rounded-3xl border border-white/15 bg-white/[0.08] backdrop-blur-md shadow-[0_10px_40px_-12px_rgba(6,16,40,.6)]; }
+  .card-snow { @apply rounded-3xl bg-frost text-midnight shadow-[0_12px_40px_-14px_rgba(6,16,40,.7)]; }
+  .btn { @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-6 py-2.5 text-[15px] font-semibold transition duration-200 disabled:cursor-not-allowed disabled:opacity-60; }
+  .btn-primary { @apply btn bg-royal text-white shadow-[0_0_0_1px_rgba(191,219,254,.35),0_8px_28px_-6px_rgba(37,99,235,.85)] hover:bg-blue-500 hover:shadow-[0_0_0_1px_rgba(191,219,254,.6),0_10px_36px_-4px_rgba(96,165,250,.9)]; }
+  .btn-ghost { @apply btn border border-white/30 text-white hover:bg-white/10; }
+  .input { @apply min-h-[48px] w-full rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-icy/60 focus:border-icy focus:outline-none focus:ring-2 focus:ring-icy/40; }
+  .container-w { @apply mx-auto w-full max-w-6xl px-5 sm:px-8; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

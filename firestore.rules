@@ -1,0 +1,51 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid));
+    }
+
+    match /adminUsers/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    match /groupSecrets/{id} { allow read, write: if false; }
+    match /rateLimits/{id}   { allow read, write: if false; }
+
+    match /{path=**}/members/{memberId} { allow read: if isAdmin(); }
+    match /{path=**}/wishlist/{itemId} { allow read: if isAdmin(); }
+
+    match /groups/{groupId} {
+      allow read: if isAdmin();
+      allow create, delete: if false;
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['groupName', 'description', 'partyDate', 'status', 'updatedAt'])
+        && request.resource.data.groupName is string
+        && request.resource.data.groupName.size() > 0
+        && request.resource.data.groupName.size() <= 100
+        && request.resource.data.status in ['active', 'archived'];
+
+      match /members/{memberId} {
+        allow read: if isAdmin();
+        allow delete: if false;
+        allow create, update: if isAdmin()
+          && request.resource.data.fullName is string
+          && request.resource.data.fullName.size() > 0
+          && request.resource.data.fullName.size() <= 100;
+
+        match /wishlist/{itemId} {
+          allow read, delete: if isAdmin();
+          allow create, update: if isAdmin()
+            && request.resource.data.itemName is string
+            && request.resource.data.itemName.size() > 0
+            && request.resource.data.itemName.size() <= 200
+            && request.resource.data.priority in ['High', 'Medium', 'Low'];
+        }
+      }
+    }
+  }
+}
