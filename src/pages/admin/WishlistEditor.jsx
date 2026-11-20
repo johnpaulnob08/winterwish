@@ -6,6 +6,7 @@ import { db } from '../../lib/firebase'
 import { safeHttp } from '../../lib/adminData'
 import Avatar from '../../components/Avatar'
 import PriorityBadge from '../../components/PriorityBadge'
+import WishlistCard from '../../components/WishlistCard'
 import { AdminEmpty, ConfirmDialog, Field, Modal, btnGhost, inputCls, useToast } from '../../components/admin/ui'
 
 const PRIORITIES = ['High', 'Medium', 'Low']
@@ -94,6 +95,29 @@ function BulkForm({ path, start, onClose }) {
   )
 }
 
+function NoteBox({ groupId, memberId, initial, onSaved }) {
+  const toast = useToast()
+  const [text, setText] = useState(initial)
+  const [busy, setBusy] = useState(false)
+  const save = async () => {
+    setBusy(true)
+    try {
+      const note = text.trim().slice(0, 500)
+      await updateDoc(doc(db, `groups/${groupId}/members`, memberId), { note, updatedAt: serverTimestamp() })
+      onSaved(note); toast('Note saved.')
+    } catch { toast('Could not save the note.', 'error') }
+    setBusy(false)
+  }
+  return (
+    <section className="mt-8 max-w-2xl rounded-3xl bg-white p-5 shadow-sm ring-1 ring-icy/60">
+      <Field label="Note shown at the bottom of this wishlist" id="nt" hint="Optional. Up to 500 characters.">
+        <textarea id="nt" rows={3} maxLength={500} className={inputCls} value={text} onChange={(e) => setText(e.target.value)} />
+      </Field>
+      <button className="btn-primary mt-3" onClick={save} disabled={busy}>{busy && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}Save note</button>
+    </section>
+  )
+}
+
 export default function WishlistEditor() {
   const { groupId, memberId } = useParams()
   const [params, setParams] = useSearchParams()
@@ -156,19 +180,7 @@ export default function WishlistEditor() {
         {items === null ? <p className="text-winter">Loading items…</p>
           : items.length === 0 ? <AdminEmpty title="This wishlist is empty" text="Add the items this member wants for Christmas."><button className="btn-primary" onClick={() => setModal('new')}><Plus className="h-4 w-4" aria-hidden="true" />Add Item</button></AdminEmpty>
           : preview ? (
-            <ul className="grid gap-5 md:grid-cols-2">
-              {items.map((it) => (
-                <li key={it.id} className="card-snow flex flex-col overflow-hidden ring-1 ring-icy sm:flex-row">
-                  {it.imageURL && safeHttp(it.imageURL) ? <img src={it.imageURL} alt="" loading="lazy" className="h-44 w-full object-cover sm:h-auto sm:w-40" /> : <div className="grid h-24 w-full place-items-center bg-ice text-royal sm:h-auto sm:w-32"><Gift className="h-9 w-9" aria-hidden="true" /></div>}
-                  <div className="flex flex-1 flex-col p-5">
-                    <PriorityBadge priority={it.priority} />
-                    <h2 className="mt-3 text-xl font-semibold leading-snug">{it.itemName}</h2>
-                    {it.description && <p className="mt-1 text-winter">{it.description}</p>}
-                    {it.productLink && safeHttp(it.productLink) && <a href={it.productLink} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-1.5 self-start text-sm font-semibold text-royal hover:underline">View product<ExternalLink className="h-4 w-4" aria-hidden="true" /></a>}
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <WishlistCard items={items} note={member.note} />
           ) : (
             <ul className="space-y-3">
               {items.map((it, i) => (
@@ -191,6 +203,7 @@ export default function WishlistEditor() {
           )}
       </div>
 
+      {!preview && items && <NoteBox key={memberId} groupId={groupId} memberId={memberId} initial={member.note || ''} onSaved={(n) => setMember((m) => ({ ...m, note: n }))} />}
       {modal === 'new' && <ItemForm path={path} nextOrder={nextOrder} onClose={() => setModal(null)} />}
       {modal === 'bulk' && <BulkForm path={path} start={nextOrder} onClose={() => setModal(null)} />}
       {modal && modal !== 'new' && modal !== 'bulk' && <ItemForm path={path} item={modal} nextOrder={nextOrder} onClose={() => setModal(null)} />}

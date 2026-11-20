@@ -170,6 +170,7 @@ async function getGroupContent(data) {
         id: m.id,
         fullName: m.get('fullName'),
         photoURL: m.get('photoURL') || null,
+        note: m.get('note') || '',
         wishlist: items.docs.map((i) => ({
           id: i.id,
           itemName: i.get('itemName'),

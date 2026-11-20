@@ -46,18 +46,16 @@ export default function GroupDashboard() {
         ) : shown.length === 0 ? (
           <EmptyState title="No one matches that name" text="Try a different spelling." />
         ) : (
-          <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
             {shown.map((m) => (
-              <li key={m.id}>
-                <Link to={`/group/${groupCode}/member/${m.id}`} className="card-snow flex items-center gap-4 p-5 transition hover:-translate-y-1 hover:shadow-[0_18px_44px_-12px_rgba(37,99,235,.55)]">
-                  <Avatar name={m.fullName} src={m.photoURL} />
-                  <div className="min-w-0">
-                    <h3 className="truncate text-xl font-semibold">{m.fullName}</h3>
-                    <p className="mt-0.5 inline-flex items-center gap-1.5 text-sm text-winter"><Gift className="h-4 w-4" aria-hidden="true" />{m.wishlist?.length || 0} wishlist {m.wishlist?.length === 1 ? 'item' : 'items'}</p>
-                    <p className="mt-1 text-sm font-semibold text-royal">View wishlist</p>
-                  </div>
-                </Link>
-              </li>
+            <li key={m.id}>
+              <Link to={`/group/${groupCode}/member/${m.id}`} className="card-snow flex h-full flex-col items-center p-4 text-center transition hover:-translate-y-1 hover:shadow-[0_18px_44px_-12px_rgba(37,99,235,.55)] sm:p-5">
+                <Avatar name={m.fullName} src={m.photoURL} size="h-20 w-20 text-2xl sm:h-24 sm:w-24" />
+                <h3 className="mt-3 w-full truncate text-lg font-semibold sm:text-xl">{m.fullName}</h3>
+                <p className="mt-0.5 inline-flex items-center gap-1 text-sm text-winter"><Gift className="h-4 w-4" aria-hidden="true" />{m.wishlist?.length || 0} {m.wishlist?.length === 1 ? 'item' : 'items'}</p>
+                <span className="mt-3 w-full rounded-full bg-royal py-2 text-sm font-semibold text-white">View wishlist</span>
+              </Link>
+            </li>
             ))}
           </ul>
         )}
